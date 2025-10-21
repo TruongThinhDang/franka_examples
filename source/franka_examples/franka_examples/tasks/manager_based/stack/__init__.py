@@ -13,11 +13,10 @@ from . import agents
 
 
 gym.register(
-    id="Template-Franka-Examples-v0",
+    id="Isaac-Stack-Cube-Franka-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
-    disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.franka_examples_env_cfg:FrankaExamplesEnvCfg",
-        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_cfg.yaml",
+        "env_cfg_entry_point": stack_joint_pos_env_cfg.FrankaCubeStackEnvCfg,
     },
+    disable_env_checker=True,
 )
