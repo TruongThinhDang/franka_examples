@@ -149,6 +149,40 @@ class ObservationsCfg2Cubes:
 class RewardsCfg2Cubes:
     """Reward terms for 2 cubes stacking task."""
 
+    reward_object = RewTerm(
+        func=mdp.object_ee_distance,
+        params={"scale": 10.0},
+        weight=0.1,
+    )
+
+    lifting_object = RewTerm(
+        func=mdp.object_is_lifted,
+        params={
+            "minimal_height": 0.04,
+            "object_cfg": SceneEntityCfg("cube_2"),
+
+        },
+        weight=1.5,
+    )
+
+    aligning_object = RewTerm(
+        func=mdp.object_is_aligned,
+        params={
+            "cube_1_cfg": SceneEntityCfg("cube_1"),
+            "cube_2_cfg": SceneEntityCfg("cube_2"),
+        },
+        weight=2.0,
+    )
+
+    success_bonus = RewTerm(
+        func=mdp.success_reward,
+        params={
+            "cube_1_cfg": SceneEntityCfg("cube_1"),
+            "cube_2_cfg": SceneEntityCfg("cube_2"),
+        },
+        weight=150.0,
+    )
+
 
 @configclass
 class TerminationsCfg2Cubes:
@@ -164,14 +198,14 @@ class TerminationsCfg2Cubes:
         func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("cube_2")}
     )
 
-    success = DoneTerm(
-        func=mdp.cubes_stacked,
-        params={
-            "cube_1_cfg": SceneEntityCfg("cube_1"),
-            "cube_2_cfg": SceneEntityCfg("cube_2"),
-            "cube_3_cfg": SceneEntityCfg("cube_2"),
-        }
-    )
+    # success = DoneTerm(
+    #     func=mdp.cubes_stacked,
+    #     params={
+    #         "cube_1_cfg": SceneEntityCfg("cube_1"),
+    #         "cube_2_cfg": SceneEntityCfg("cube_2"),
+    #         "cube_3_cfg": SceneEntityCfg("cube_2"),
+    #     }
+    # )
 
 
 @configclass
