@@ -49,7 +49,7 @@ def object_ee_distance(
 
 def object_is_lifted(
     env: ManagerBasedRLEnv,
-    minimal_height: float,
+    minimal_height: float = 0.04,
     object_cfg: SceneEntityCfg = SceneEntityCfg("cube_2"),
 ) -> torch.Tensor:
     """Reward the agent for lifting the object above the minimal height."""
@@ -78,7 +78,7 @@ def object_is_aligned(
 
     distance = torch.norm(pos_diff_with_offset, dim=1)
 
-    is_lifted = object_is_lifted(env, object_cfg=cube_2_cfg, minimal_height=0.04) 
+    is_lifted = object_is_lifted(env) 
 
     return (1 - torch.tanh(scale * distance)) * is_lifted * (1 - success_reward(env))
 
@@ -102,7 +102,7 @@ def success_reward(
     xy_dist_c12 = torch.norm(pos_diff_c12[:, :2], dim=1)
 
     # Compute cube height difference
-    h_dist_c12 = torch.norm(pos_diff_c12[:, 2:], dim=1)
+    h_dist_c12 = torch.abs(pos_diff_c12[:, 2] - height_diff)
 
     # Compute gripper away from cube
     ee_pos = ee_frame.data.target_pos_w[:, 0, :]
@@ -110,7 +110,7 @@ def success_reward(
     gripper_dist = torch.norm(ee_pos - cube_2_pos, dim=1)
 
     # Check cube positions
-    stacked = torch.logical_and(xy_dist_c12 < xy_threshold, h_dist_c12 - height_diff < height_threshold)
+    stacked = torch.logical_and(xy_dist_c12 < xy_threshold, h_dist_c12 < height_threshold)
     stacked = torch.logical_and(gripper_dist > gripper_away_threshold, stacked)
 
     return stacked.to(torch.float32)
